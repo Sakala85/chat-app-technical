@@ -21,10 +21,13 @@ class UserMessage(BaseModel):
 
 @app.post("/chat")
 async def chat_endpoint(payload: UserMessage):
-    # Validate chat history
-    if not validate_chat_history(payload.chat_history):
-        raise HTTPException(status_code=400, detail="Invalid chat history")
+    try:
+        # Validate chat history
+        if not validate_chat_history(payload.chat_history):
+            raise HTTPException(status_code=400, detail="Invalid chat history")
 
-    # Process and return the agent's response
-    agent_response = await process_message(payload.message)
-    return {"reply": agent_response}
+        # Process and return the agent's response
+        agent_response = await process_message(payload.message)
+        return {"reply": agent_response}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error processing chat: {str(e)}")
